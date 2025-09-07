@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   Home, 
@@ -8,14 +8,37 @@ import {
   Calendar,
   Menu,
   X,
-  Heart
+  Heart,
+  LogIn,
+  LogOut,
+  User,
+  Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const location = useLocation();
+
+  useEffect(() => {
+    // Check login status from localStorage
+    const loginStatus = localStorage.getItem("isLoggedIn") === "true";
+    const role = localStorage.getItem("userRole");
+    setIsLoggedIn(loginStatus);
+    setUserRole(role);
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userEmail");
+    setIsLoggedIn(false);
+    setUserRole(null);
+    window.location.href = "/";
+  };
 
   const navigationItems = [
     { name: "Home", href: "/", icon: Home },
@@ -58,6 +81,38 @@ const Navigation = () => {
                 </Link>
               );
             })}
+            
+            {/* Auth Buttons */}
+            <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-border">
+              {isLoggedIn ? (
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1 px-3 py-1 rounded-lg bg-accent text-accent-foreground">
+                    {userRole === "admin" ? (
+                      <Shield className="h-4 w-4" />
+                    ) : (
+                      <User className="h-4 w-4" />
+                    )}
+                    <span className="text-sm font-medium capitalize">{userRole}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="flex items-center space-x-1"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/login">
+                  <Button variant="outline" size="sm" className="flex items-center space-x-1">
+                    <LogIn className="h-4 w-4" />
+                    <span>Login</span>
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -96,6 +151,37 @@ const Navigation = () => {
                 </Link>
               );
             })}
+            
+            {/* Mobile Auth Section */}
+            <div className="border-t border-border pt-3 mt-3">
+              {isLoggedIn ? (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-accent text-accent-foreground">
+                    {userRole === "admin" ? (
+                      <Shield className="h-5 w-5" />
+                    ) : (
+                      <User className="h-5 w-5" />
+                    )}
+                    <span className="font-medium capitalize">{userRole}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={handleLogout}
+                    className="w-full flex items-center space-x-2"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Logout</span>
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/login" onClick={() => setIsOpen(false)}>
+                  <Button variant="outline" className="w-full flex items-center space-x-2">
+                    <LogIn className="h-4 w-4" />
+                    <span>Login</span>
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}
