@@ -40,13 +40,22 @@ const Navigation = () => {
     window.location.href = "/";
   };
 
-  const navigationItems = [
+  const adminNavigationItems = [
+    { name: "Dashboard", href: "/admin/dashboard", icon: Home },
+    { name: "Users", href: "/admin/users", icon: Users },
+    { name: "Resources", href: "/admin/resources", icon: BookOpen },
+    { name: "Community", href: "/admin/community", icon: MessageCircle },
+  ];
+
+  const studentNavigationItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "AI Support", href: "/chat", icon: MessageCircle },
     { name: "Resources", href: "/resources", icon: BookOpen },
     { name: "Community", href: "/community", icon: Users },
     { name: "Book Session", href: "/booking", icon: Calendar },
   ];
+
+  const navigationItems = userRole === "admin" ? adminNavigationItems : studentNavigationItems;
 
   const isActive = (path: string) => location.pathname === path;
 
